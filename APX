@@ -1,0 +1,60 @@
+//json
+[
+    {
+        "title": "La magia de la vida",
+        "rating": 4,
+        "tags": ["acción", "favorita", "nueva"]
+    },
+    {
+        "title": "Un monstruo viene a verme",
+        "rating": 3,
+        "tags": ["favorita", "nueva"]
+    },
+    {
+        "title": "Bajo Cero",
+        "rating": 5,
+        "tags": ["thriller", "acción"]
+    }
+]
+//javascript
+const fs = require('fs');
+
+const getMovies = () => {
+    const data = fs.readFileSync('pelis.json');
+    return JSON.parse(data);
+};
+
+const sortMovies = (movies, property) => {
+    return movies.sort((a, b) => (a[property] > b[property]) ? 1 : -1);
+};
+
+const searchMovies = (movies, criteria) => {
+    return movies.filter(movie => movie.title.toLowerCase().includes(criteria.toLowerCase()));
+};
+
+const tagMovies = (movies, tag) => {
+    return movies.filter(movie => movie.tags.includes(tag));
+};
+
+module.exports = { getMovies, sortMovies, searchMovies, tagMovies };
+
+//index.js
+const { getMovies, sortMovies, searchMovies, tagMovies } = require('./pelis');
+
+const args = process.argv.slice(2);
+const movies = getMovies();
+
+if (args.length === 0) {
+    console.table(movies);
+} else if (args[0] === '--sort') {
+    const sortedMovies = sortMovies(movies, args[1]);
+    console.table(sortedMovies);
+} else if (args[0] === '--search') {
+    const searchedMovies = searchMovies(movies, args[1]);
+    console.table(searchedMovies);
+} else if (args[0] === '--tag') {
+    const taggedMovies = tagMovies(movies, args[1]);
+    console.table(taggedMovies);
+} else {
+    console.log('Argumento no reconocido');
+}
